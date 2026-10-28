@@ -36,3 +36,16 @@ tresenraya_add_test(tst_gamecontroller
     SOURCES presentation/tst_gamecontroller.cpp
     LIBRARIES TresEnRaya::Presentation)
 
+# Pruebas generadas por IA para la comparación (ver ia/prompts.md).
+# Se conservan tal como las entregó la IA; tienen la etiqueta "ia" y se ejecutan
+# aparte con: ctest --preset ia
+tresenraya_add_test(tst_ia_basico
+    SOURCES ia/basico/tst_tictactoe.cpp ia/basico/TicTacToe.h
+    LIBRARIES TresEnRaya::Core)
+target_include_directories(tst_ia_basico PRIVATE ia/basico)
+
+tresenraya_add_test(tst_ia_estructurado
+    SOURCES ia/estructurado/tst_ia_estructurado.cpp
+    LIBRARIES TresEnRaya::Core)
+
+set_tests_properties(tst_ia_basico tst_ia_estructurado PROPERTIES LABELS "ia")
