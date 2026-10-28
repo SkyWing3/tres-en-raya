@@ -18,3 +18,4 @@ target_include_directories(tresenraya_core PUBLIC
 
 target_compile_features(tresenraya_core PUBLIC cxx_std_20)
 tresenraya_enable_warnings(tresenraya_core)
+tresenraya_enable_coverage(tresenraya_core)

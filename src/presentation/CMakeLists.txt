@@ -23,3 +23,4 @@ target_link_libraries(tresenraya_presentation PUBLIC
     TresEnRaya::Core)
 
 tresenraya_enable_warnings(tresenraya_presentation)
+tresenraya_enable_coverage(tresenraya_presentation)

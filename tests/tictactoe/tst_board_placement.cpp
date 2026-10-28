@@ -6,6 +6,9 @@
 
 #include <QtTest>
 
+#include <limits>
+#include <string>
+
 using namespace tresenraya::tictactoe;
 
 class TestBoardPlacement : public QObject
@@ -25,6 +28,10 @@ private slots:
 
     // Cuando una pieza esté en un lugar ya ocupado, se debe lanzar una excepción
     void pieceOnOccupiedCellThrows();
+    void cellOccupiedByOReportsO();
+
+    // El mensaje de la excepción indica el eje y el valor inválidos
+    void exceptionMessageNamesTheAxisAndValue();
 
     // Comportamiento complementario
     void pieceInsideBoardIsPlaced_data();
@@ -47,6 +54,8 @@ void TestBoardPlacement::pieceOutsideXAxisThrows_data()
     QTest::newRow("x = 0") << 0;
     QTest::newRow("x = 4") << 4;
     QTest::newRow("x = -1") << -1;
+    QTest::newRow("x = INT_MIN") << std::numeric_limits<int>::min();
+    QTest::newRow("x = INT_MAX") << std::numeric_limits<int>::max();
 }
 
 void TestBoardPlacement::pieceOutsideXAxisThrows()
@@ -69,6 +78,8 @@ void TestBoardPlacement::pieceOutsideYAxisThrows_data()
     QTest::newRow("y = 0") << 0;
     QTest::newRow("y = 4") << 4;
     QTest::newRow("y = 10") << 10;
+    QTest::newRow("y = INT_MIN") << std::numeric_limits<int>::min();
+    QTest::newRow("y = INT_MAX") << std::numeric_limits<int>::max();
 }
 
 void TestBoardPlacement::pieceOutsideYAxisThrows()
@@ -94,6 +105,31 @@ void TestBoardPlacement::pieceOnOccupiedCellThrows()
     } catch (const OccupiedCellException &exception) {
         QCOMPARE(exception.position(), (Position{2, 1}));
         QCOMPARE(exception.occupant(), Player::X);
+    }
+}
+
+void TestBoardPlacement::cellOccupiedByOReportsO()
+{
+    m_game.play({1, 1}); // X
+    m_game.play({2, 2}); // O
+
+    try {
+        m_game.play({2, 2}); // X intenta jugar sobre la O
+        QFAIL("Se esperaba OccupiedCellException");
+    } catch (const OccupiedCellException &exception) {
+        QCOMPARE(exception.occupant(), Player::O);
+    }
+}
+
+void TestBoardPlacement::exceptionMessageNamesTheAxisAndValue()
+{
+    try {
+        m_game.play({2, 7});
+        QFAIL("Se esperaba OutOfBoardException");
+    } catch (const OutOfBoardException &exception) {
+        const std::string message = exception.what();
+        QVERIFY2(message.find("eje Y") != std::string::npos, exception.what());
+        QVERIFY2(message.find('7') != std::string::npos, exception.what());
     }
 }
 

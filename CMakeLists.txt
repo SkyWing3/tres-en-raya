@@ -16,9 +16,10 @@ option(TRESENRAYA_WARNINGS_AS_ERRORS "Tratar las advertencias del compilador com
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(CompilerWarnings)
+include(Coverage)
 
-find_package(Qt6 6.9 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2 Quick3D)
-qt_standard_project_setup(REQUIRES 6.9)
+find_package(Qt6 6.10 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2 Quick3D)
+qt_standard_project_setup(REQUIRES 6.10)
 
 # Todos los módulos QML en un mismo árbol, para que qmllint y Qt Creator los encuentren.
 set(QT_QML_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/qml")

@@ -13,6 +13,10 @@ function(tresenraya_add_test name)
 endfunction()
 
 # Requerimiento 1: colocar piezas en un tablero de 3x3
+tresenraya_add_test(tst_board
+    SOURCES tictactoe/tst_board.cpp
+    LIBRARIES TresEnRaya::Core)
+
 tresenraya_add_test(tst_board_placement
     SOURCES tictactoe/tst_board_placement.cpp
     LIBRARIES TresEnRaya::Core)
@@ -31,3 +35,4 @@ tresenraya_add_test(tst_winner
 tresenraya_add_test(tst_gamecontroller
     SOURCES presentation/tst_gamecontroller.cpp
     LIBRARIES TresEnRaya::Presentation)
+

@@ -1,6 +1,7 @@
 // TDD Kata para Tres en Raya
 // Requerimiento 2: Debe existir una forma de determinar qué jugador juega después
 
+#include "tresenraya/tictactoe/GameExceptions.h"
 #include "tresenraya/tictactoe/TicTacToe.h"
 
 #include <QtTest>
@@ -25,7 +26,9 @@ private slots:
 
     // Comportamiento complementario
     void turnsAlternateDuringTheWholeGame();
+    void rejectedMoveDoesNotConsumeTheTurn();
     void resetGivesTheFirstTurnBackToX();
+    void playersAreXAndO();
 
 private:
     TicTacToe m_game;
@@ -79,6 +82,17 @@ void TestTurns::turnsAlternateDuringTheWholeGame()
     QCOMPARE(m_game.status(), GameStatus::Draw);
 }
 
+void TestTurns::rejectedMoveDoesNotConsumeTheTurn()
+{
+    m_game.play({1, 1}); // X
+
+    QVERIFY_THROWS_EXCEPTION(InvalidMoveException, m_game.play({1, 1}));
+    QVERIFY_THROWS_EXCEPTION(InvalidMoveException, m_game.play({0, 1}));
+
+    QCOMPARE(m_game.lastPlayer(), Player::X);
+    QCOMPARE(m_game.nextPlayer(), Player::O);
+}
+
 void TestTurns::resetGivesTheFirstTurnBackToX()
 {
     m_game.play({1, 1});
@@ -86,6 +100,18 @@ void TestTurns::resetGivesTheFirstTurnBackToX()
 
     QCOMPARE(m_game.nextPlayer(), Player::X);
     QVERIFY(m_game.board().isEmpty());
+}
+
+void TestTurns::playersAreXAndO()
+{
+    // Se verifican en compilación: si cambian, el proyecto no compila.
+    static_assert(symbolOf(Player::X) == 'X');
+    static_assert(symbolOf(Player::O) == 'O');
+    static_assert(opponentOf(Player::X) == Player::O);
+    static_assert(opponentOf(Player::O) == Player::X);
+    static_assert(TicTacToe::kFirstPlayer == Player::X);
+
+    QCOMPARE(symbolOf(m_game.nextPlayer()), 'X');
 }
 
 QTEST_APPLESS_MAIN(TestTurns)

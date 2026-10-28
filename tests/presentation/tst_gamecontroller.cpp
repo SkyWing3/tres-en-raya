@@ -22,9 +22,18 @@ private slots:
     void outOfBoardMoveIsRejectedWithAMessage();
     void occupiedCellIsRejected();
     void winIsReportedAndScored();
+    void oWinIsScored();
     void drawIsScored();
     void newGameKeepsTheScore();
     void resetScoreClearsCounters();
+    void playCellMapsEachIndexToItsCoordinates_data();
+    void playCellMapsEachIndexToItsCoordinates();
+    void boardModelExposesRolesForQml();
+    void winningCellsIsEmptyWhileInProgress();
+    void moveAfterTheGameIsOverIsRejected();
+    void newGameRefreshesTheBoardModel();
+    void coordinateLimitsMatchTheDomain();
+    void boardModelIgnoresInvalidRequests();
 
 private:
     static QString pieceAt(GameController &controller, int cellIndex);
@@ -142,6 +151,17 @@ void TestGameController::winIsReportedAndScored()
     QVERIFY(!model->data(model->index(4), BoardModel::WinningRole).toBool());
 }
 
+void TestGameController::oWinIsScored()
+{
+    // X: 0, 1, 8 | O: 3, 4, 5 (fila central)
+    playCells(*m_controller, {0, 3, 1, 4, 8, 5});
+
+    QCOMPARE(m_controller->winner(), QStringLiteral("O"));
+    QCOMPARE(m_controller->winningCells(), (QList<int>{3, 4, 5}));
+    QCOMPARE(m_controller->oWins(), 1);
+    QCOMPARE(m_controller->xWins(), 0);
+}
+
 void TestGameController::drawIsScored()
 {
     playCells(*m_controller, {0, 1, 2, 4, 3, 5, 7, 6, 8});
@@ -174,6 +194,94 @@ void TestGameController::resetScoreClearsCounters()
     QCOMPARE(m_controller->xWins(), 0);
     QCOMPARE(m_controller->oWins(), 0);
     QCOMPARE(m_controller->draws(), 0);
+}
+
+void TestGameController::playCellMapsEachIndexToItsCoordinates_data()
+{
+    QTest::addColumn<int>("cellIndex");
+    QTest::addColumn<int>("column");
+    QTest::addColumn<int>("row");
+
+    for (int cell = 0; cell < 9; ++cell)
+        QTest::addRow("casilla %d", cell) << cell << cell % 3 + 1 << cell / 3 + 1;
+}
+
+void TestGameController::playCellMapsEachIndexToItsCoordinates()
+{
+    QFETCH(int, cellIndex);
+    QFETCH(int, column);
+    QFETCH(int, row);
+    QSignalSpy placedSpy(m_controller.get(), &GameController::piecePlaced);
+
+    QVERIFY(m_controller->playCell(cellIndex));
+
+    const auto *model = m_controller->board();
+    const QModelIndex index = model->index(cellIndex);
+    QCOMPARE(model->data(index, BoardModel::ColumnRole).toInt(), column);
+    QCOMPARE(model->data(index, BoardModel::RowRole).toInt(), row);
+    QCOMPARE(pieceAt(*m_controller, cellIndex), QStringLiteral("X"));
+    QCOMPARE(placedSpy.first().at(0).toInt(), cellIndex);
+
+    // La misma casilla, pedida por coordenadas, ya está ocupada.
+    QVERIFY(!m_controller->play(column, row));
+}
+
+void TestGameController::boardModelExposesRolesForQml()
+{
+    const QHash<int, QByteArray> roles = m_controller->board()->roleNames();
+
+    QCOMPARE(roles.value(BoardModel::PieceRole), QByteArray("piece"));
+    QCOMPARE(roles.value(BoardModel::ColumnRole), QByteArray("column"));
+    QCOMPARE(roles.value(BoardModel::RowRole), QByteArray("row"));
+    QCOMPARE(roles.value(BoardModel::WinningRole), QByteArray("winning"));
+}
+
+void TestGameController::winningCellsIsEmptyWhileInProgress()
+{
+    playCells(*m_controller, {0, 4});
+
+    QVERIFY(m_controller->winningCells().isEmpty());
+    QVERIFY(m_controller->winner().isEmpty());
+    QVERIFY(!m_controller->isGameOver());
+}
+
+void TestGameController::moveAfterTheGameIsOverIsRejected()
+{
+    playCells(*m_controller, {0, 3, 1, 4, 2});
+    QSignalSpy rejectedSpy(m_controller.get(), &GameController::moveRejected);
+
+    QVERIFY(!m_controller->playCell(8));
+
+    QCOMPARE(rejectedSpy.count(), 1);
+    QVERIFY(rejectedSpy.first().at(0).toString().contains(QStringLiteral("terminó")));
+    QVERIFY(pieceAt(*m_controller, 8).isEmpty());
+}
+
+void TestGameController::newGameRefreshesTheBoardModel()
+{
+    playCells(*m_controller, {0, 4});
+    QSignalSpy dataSpy(m_controller->board(), &QAbstractItemModel::dataChanged);
+
+    m_controller->newGame();
+
+    QCOMPARE(dataSpy.count(), 1);
+    for (int cell = 0; cell < 9; ++cell)
+        QVERIFY(pieceAt(*m_controller, cell).isEmpty());
+}
+
+void TestGameController::coordinateLimitsMatchTheDomain()
+{
+    QCOMPARE(GameController::minCoordinate(), 1);
+    QCOMPARE(GameController::maxCoordinate(), 3);
+}
+
+void TestGameController::boardModelIgnoresInvalidRequests()
+{
+    const auto *model = m_controller->board();
+
+    QVERIFY(!model->data(QModelIndex(), BoardModel::PieceRole).isValid());
+    QVERIFY(!model->data(model->index(0), Qt::DisplayRole).isValid());
+    QCOMPARE(model->rowCount(model->index(0)), 0); // Es una lista: sin hijos
 }
 
 QTEST_GUILESS_MAIN(TestGameController)

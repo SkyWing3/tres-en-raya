@@ -136,7 +136,7 @@ sin recompilar, define la variable de entorno `QT_QUICK_CONTROLS_STYLE` (por eje
 
 ## Requisitos
 
-- **Qt 6.9 o superior** con los módulos *Qt Quick*, *Qt Quick Controls*, *Qt Quick 3D*,
+- **Qt 6.10 o superior** con los módulos *Qt Quick*, *Qt Quick Controls*, *Qt Quick 3D*,
   *Qt Shader Tools* y *Qt Test*. Se desarrolló y probó con Qt 6.12.
 - **CMake 3.25+** y **Ninja**.
 - Compilador C++20:

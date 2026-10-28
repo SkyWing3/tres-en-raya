@@ -51,7 +51,9 @@ private slots:
     // Comportamiento complementario
     void oCanAlsoWin();
     void fullBoardWithoutLineIsADraw();
+    void winningOnTheLastMoveIsNotADraw();
     void noMovesAreAllowedAfterTheGameIsOver();
+    void resetAfterAWinStartsACleanGame();
 
 private:
     TicTacToe m_game;
@@ -154,11 +156,42 @@ void TestWinner::fullBoardWithoutLineIsADraw()
     QVERIFY(m_game.isOver());
 }
 
+void TestWinner::winningOnTheLastMoveIsNotADraw()
+{
+    // Tablero final (X gana con la diagonal al ocupar la última casilla):
+    //   X O O
+    //   O X X
+    //   X O X
+    // clang-format off
+    const auto status = playAll(m_game, {{1, 1}, {2, 1}, {2, 2}, {3, 1}, {3, 2},
+                                         {1, 2}, {1, 3}, {2, 3}, {3, 3}});
+    // clang-format on
+
+    QVERIFY(m_game.board().isFull());
+    QCOMPARE(status, GameStatus::Won);
+    QCOMPARE(m_game.winner(), Player::X);
+    QCOMPARE(m_game.winningLine(), (Line{{{1, 1}, {2, 2}, {3, 3}}}));
+}
+
 void TestWinner::noMovesAreAllowedAfterTheGameIsOver()
 {
     playAll(m_game, {{1, 1}, {1, 2}, {2, 1}, {2, 2}, {3, 1}});
 
     QVERIFY_THROWS_EXCEPTION(GameOverException, m_game.play({3, 3}));
+}
+
+void TestWinner::resetAfterAWinStartsACleanGame()
+{
+    playAll(m_game, {{1, 1}, {1, 2}, {2, 1}, {2, 2}, {3, 1}});
+    QCOMPARE(m_game.status(), GameStatus::Won);
+
+    m_game.reset();
+
+    QCOMPARE(m_game.status(), GameStatus::InProgress);
+    QCOMPARE(m_game.winner(), std::nullopt);
+    QCOMPARE(m_game.winningLine(), std::nullopt);
+    QVERIFY(!m_game.isOver());
+    QCOMPARE(m_game.play({3, 3}), GameStatus::InProgress);
 }
 
 QTEST_APPLESS_MAIN(TestWinner)
