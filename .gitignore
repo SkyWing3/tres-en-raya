@@ -17,3 +17,15 @@ compile_commands.json
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+# Archivos auxiliares de LaTeX (el PDF sí se versiona)
+docs/presentacion/*.aux
+docs/presentacion/*.fdb_latexmk
+docs/presentacion/*.fls
+docs/presentacion/*.log
+docs/presentacion/*.nav
+docs/presentacion/*.out
+docs/presentacion/*.snm
+docs/presentacion/*.synctex.gz
+docs/presentacion/*.toc
+docs/presentacion/*.vrb

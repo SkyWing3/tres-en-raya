@@ -1,5 +1,7 @@
 # Tres en Raya — TDD Kata
 
+[![CI](https://github.com/SkyWing3/tres-en-raya/actions/workflows/ci.yml/badge.svg)](https://github.com/SkyWing3/tres-en-raya/actions/workflows/ci.yml)
+
 Aplicación de escritorio en **Qt 6 / C++20** que implementa la *TDD Kata para Tres en Raya*
 de la materia **Gestión de Calidad de Sistemas (UCB)**. Toda la lógica del juego se escribió
 guiada por pruebas (Qt Test) y la interfaz usa un **tablero en 3D** (Qt Quick 3D) junto con
@@ -8,6 +10,26 @@ guiada por pruebas (Qt Test) y la interfaz usa un **tablero en 3D** (Qt Quick 3D
 | Modo claro (victoria de X) | Modo oscuro (jugada inválida) |
 | --- | --- |
 | ![Victoria en modo claro](docs/victoria-modo-claro.png) | ![Excepción en modo oscuro](docs/excepcion-modo-oscuro.png) |
+
+## Entregables del trabajo
+
+| Entregable | Ubicación |
+| --- | --- |
+| Código del programa y pruebas unitarias | [`src/`](src) y [`tests/`](tests) |
+| Prompts para generar las pruebas con IA | [`ia/prompts.md`](ia/prompts.md) |
+| Respuestas de la IA, sin cambios | [`ia/respuestas/`](ia/respuestas) y [`tests/ia/`](tests/ia) |
+| Qué pasó al compilar y ejecutar lo generado | [`ia/resultados.md`](ia/resultados.md) |
+| Presentación de la comparación (LaTeX y PDF) | [`docs/presentacion/`](docs/presentacion) |
+| Métricas reproducibles | [`docs/resultados/resumen.md`](docs/resultados/resumen.md) |
+
+### Resumen de la comparación
+
+| | Repositorio (TDD) | IA: prompt básico | IA: prompt estructurado |
+| --- | --- | --- | --- |
+| Casos ejecutados | 85 | 11 | 23 |
+| Fallan con el código correcto | 0 | 0 | 1 |
+| Cobertura de líneas del dominio | 100 % | 64 % | 96,8 % |
+| Mutantes detectados | **16 / 16** | 5 / 16 | 14 / 16 |
 
 ---
 
@@ -18,15 +40,18 @@ comportamiento y, encima de cada declaración, un comentario cita el requerimien
 
 ### Requerimiento 1 — Una pieza puede estar colocada en un espacio de un tablero 3x3
 
-Archivo: [`tests/tictactoe/tst_board_placement.cpp`](tests/tictactoe/tst_board_placement.cpp)
+Archivos: [`tests/tictactoe/tst_board_placement.cpp`](tests/tictactoe/tst_board_placement.cpp)
+y [`tests/tictactoe/tst_board.cpp`](tests/tictactoe/tst_board.cpp) (el tablero por separado).
 
 | Prueba de la kata | Función de prueba |
 | --- | --- |
-| Cuando una pieza está fuera del eje X, se lanza una excepción | `pieceOutsideXAxisThrows` (x = 0, 4, -1) |
-| Cuando una pieza está fuera del eje Y, se lanza una excepción | `pieceOutsideYAxisThrows` (y = 0, 4, 10) |
-| Cuando una pieza está en un lugar ya ocupado, se lanza una excepción | `pieceOnOccupiedCellThrows` |
+| Cuando una pieza está fuera del eje X, se lanza una excepción | `pieceOutsideXAxisThrows` (x = 0, 4, -1, `INT_MIN`, `INT_MAX`) |
+| Cuando una pieza está fuera del eje Y, se lanza una excepción | `pieceOutsideYAxisThrows` (y = 0, 4, 10, `INT_MIN`, `INT_MAX`) |
+| Cuando una pieza está en un lugar ya ocupado, se lanza una excepción | `pieceOnOccupiedCellThrows`, `cellOccupiedByOReportsO` |
+| *Complementaria:* el mensaje indica el eje y el valor | `exceptionMessageNamesTheAxisAndValue` |
 | *Complementaria:* toda casilla válida acepta una pieza | `pieceInsideBoardIsPlaced` (las 9 casillas) |
 | *Complementaria:* una jugada rechazada no altera la partida | `rejectedMoveDoesNotChangeTheGame` |
+| *Complementaria:* el tablero aislado (vacío, lleno, limpiar, ambos ejes fuera) | `tst_board` (9 pruebas) |
 
 ### Requerimiento 2 — Debe existir una forma de determinar qué jugador juega después
 
@@ -38,7 +63,9 @@ Archivo: [`tests/tictactoe/tst_turns.cpp`](tests/tictactoe/tst_turns.cpp)
 | Si el último turno fue de 'X', el siguiente es para 'O' | `afterXComesO` |
 | Si el último turno fue de 'O', el siguiente es para 'X' | `afterOComesX` |
 | *Complementaria:* los turnos alternan durante toda la partida | `turnsAlternateDuringTheWholeGame` |
+| *Complementaria:* una jugada inválida no consume el turno | `rejectedMoveDoesNotConsumeTheTurn` |
 | *Complementaria:* reiniciar devuelve el turno a 'X' | `resetGivesTheFirstTurnBackToX` |
+| *Complementaria:* los jugadores son 'X' y 'O' (verificado al compilar) | `playersAreXAndO` |
 
 ### Requerimiento 3 — Gana quien conecta primero una línea de lado a lado o de esquina a esquina
 
@@ -52,7 +79,9 @@ Archivo: [`tests/tictactoe/tst_winner.cpp`](tests/tictactoe/tst_winner.cpp)
 | Gana con toda una línea diagonal | `topLeftToBottomRightDiagonalWins`, `topRightToBottomLeftDiagonalWins` |
 | *Complementaria:* 'O' también puede ganar | `oCanAlsoWin` |
 | *Complementaria:* tablero lleno sin línea = empate | `fullBoardWithoutLineIsADraw` |
+| *Complementaria:* ganar en la última jugada no es empate | `winningOnTheLastMoveIsNotADraw` |
 | *Complementaria:* no se puede jugar después de terminar | `noMovesAreAllowedAfterTheGameIsOver` |
+| *Complementaria:* reiniciar después de ganar deja una partida limpia | `resetAfterAWinStartsACleanGame` |
 
 ### Capa de presentación
 
@@ -177,6 +206,21 @@ Otros presets:
 
 - `release`: compilación optimizada.
 - `ci`: sólo el dominio, la capa de presentación y las pruebas, sin interfaz gráfica.
+- `coverage`: igual que `ci`, con instrumentación para medir cobertura.
+- `ia` (sólo pruebas): ejecuta las suites generadas por IA, que se excluyen de `ctest --preset debug`.
+
+### Medir la calidad de las pruebas
+
+```bash
+tools/coverage.sh                  # cobertura (llvm-cov); reporte HTML en build/coverage/html
+python3 tools/compare_suites.py    # cobertura + pruebas de mutación de las tres suites
+```
+
+`compare_suites.py` trabaja sobre una copia temporal del proyecto. Introduce 16 errores
+deliberados (mutantes) en el dominio y cuenta cuántos detecta cada suite. Los resultados se
+escriben en [`docs/resultados/`](docs/resultados) y la presentación los lee de ahí.
+
+Para regenerar el PDF de la presentación: `cd docs/presentacion && latexmk -pdf presentacion.tex`.
 
 ### Distribuir
 
@@ -194,6 +238,10 @@ copiar las bibliotecas necesarias.
 
 - **TDD**: cada requerimiento de la kata tiene su archivo de pruebas, que especifica el
   comportamiento esperado; el dominio se implementó para satisfacerlas.
+- **Calidad de las pruebas medida, no supuesta**: 100 % de cobertura de líneas y ramas del
+  dominio, y 16 de 16 mutantes detectados.
+- **Integración continua**: GitHub Actions compila y prueba en Linux, macOS y Windows en
+  cada `push` y *pull request*.
 - **Pruebas legibles**: estructura *Arrange / Act / Assert*, pruebas con datos
   (`_data()` + `QFETCH`) para cubrir variantes sin duplicar código, `init()` para aislar
   cada caso, y `QSignalSpy` y `QAbstractItemModelTester` para la capa Qt.
@@ -202,7 +250,7 @@ copiar las bibliotecas necesarias.
   - Dependencias hacia el dominio: el núcleo no conoce a Qt.
 - **Seguridad de tipos**: `enum class` para jugadores, ejes y estados; `std::optional` para
   "sin pieza" o "sin ganador"; `[[nodiscard]]`, `constexpr` y `noexcept` donde corresponde.
-- **Compilación estricta**:
+- **Compilación estricta** del código escrito a mano (el código que genera Qt queda fuera):
   - GCC/Clang: `-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wold-style-cast …` con
     `-Werror`.
   - MSVC: `/W4 /permissive- /WX`.
@@ -220,9 +268,10 @@ copiar las bibliotecas necesarias.
 
 ```
 tres-en-raya/
+├── .github/workflows/ci.yml    Integración continua (Linux, macOS, Windows)
 ├── CMakeLists.txt              Proyecto raíz (opciones, Qt, subdirectorios)
-├── CMakePresets.json           Presets debug / release / ci
-├── cmake/CompilerWarnings.cmake
+├── CMakePresets.json           Presets debug / release / ci / coverage
+├── cmake/                      Advertencias del compilador y cobertura
 ├── src/
 │   ├── core/                   Dominio en C++20 puro
 │   │   ├── include/tresenraya/tictactoe/*.h
@@ -234,6 +283,11 @@ tres-en-raya/
 │       └── platform/           Info.plist + .icns (macOS), .rc + .ico (Windows)
 ├── tests/
 │   ├── tictactoe/              Pruebas de la kata (Req. 1, 2 y 3)
-│   └── presentation/           Pruebas del ViewModel
-└── docs/                       Capturas de pantalla
+│   ├── presentation/           Pruebas del ViewModel
+│   └── ia/                     Pruebas generadas por IA, tal como se entregaron
+├── ia/                         Prompts, respuestas de la IA y resultados
+├── tools/                      Cobertura y comparación con pruebas de mutación
+└── docs/
+    ├── presentacion/           Presentación en LaTeX (Beamer) y su PDF
+    └── resultados/             Métricas generadas por tools/compare_suites.py
 ```
