@@ -159,10 +159,12 @@ void TestBoardPlacement::rejectedMoveDoesNotChangeTheGame()
     m_game.play({1, 1});
 
     QVERIFY_THROWS_EXCEPTION(InvalidMoveException, m_game.play({1, 1}));
-    QVERIFY_THROWS_EXCEPTION(InvalidMoveException, m_game.play({5, 1}));
-
     QCOMPARE(m_game.nextPlayer(), Player::O);
     QCOMPARE(m_game.board().pieceAt({1, 1}), Player::X);
+
+    QVERIFY_THROWS_EXCEPTION(InvalidMoveException, m_game.play({5, 1}));
+    QCOMPARE(m_game.nextPlayer(), Player::O);
+    QVERIFY(m_game.board().pieceAt({2, 2}) == std::nullopt);
 }
 
 QTEST_APPLESS_MAIN(TestBoardPlacement)

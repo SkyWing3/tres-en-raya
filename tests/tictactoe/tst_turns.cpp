@@ -86,9 +86,13 @@ void TestTurns::rejectedMoveDoesNotConsumeTheTurn()
 {
     m_game.play({1, 1}); // X
 
+    // Se verifica después de CADA jugada inválida: si se verificara sólo al final,
+    // dos turnos perdidos seguidos se anularían entre sí y el error pasaría inadvertido.
     QVERIFY_THROWS_EXCEPTION(InvalidMoveException, m_game.play({1, 1}));
-    QVERIFY_THROWS_EXCEPTION(InvalidMoveException, m_game.play({0, 1}));
+    QCOMPARE(m_game.lastPlayer(), Player::X);
+    QCOMPARE(m_game.nextPlayer(), Player::O);
 
+    QVERIFY_THROWS_EXCEPTION(InvalidMoveException, m_game.play({0, 1}));
     QCOMPARE(m_game.lastPlayer(), Player::X);
     QCOMPARE(m_game.nextPlayer(), Player::O);
 }
