@@ -12,7 +12,7 @@ El trabajo se hace en una copia temporal del proyecto: el árbol de trabajo no s
 Requiere Clang con llvm-profdata y llvm-cov (en macOS vienen con Xcode).
 
 Uso:  python3 tools/compare_suites.py
-Salida: docs/resultados/{resultados.json, resumen.md, resumen.tex, mutantes.tex}
+Salida: docs/resultados/{resultados.json, resumen.md, resumen.tex, mutantes.tex, metricas.tex}
 """
 
 from __future__ import annotations
@@ -112,7 +112,7 @@ MUTANTS = (
            "    else if (m_winningLine)\n        m_status = GameStatus::Won;\n"),
     Mutant("M14", "R3", "Se puede seguir jugando después de ganar", GAME,
            "    if (isOver())\n        throw GameOverException();\n", ""),
-    Mutant("M15", "R3", "winner() devuelve al último jugador aunque no haya ganado", GAME,
+    Mutant("M15", "R3", "winner() informa un ganador cuando nadie ganó", GAME,
            "return m_status == GameStatus::Won ? m_lastPlayer : std::nullopt;", "return m_lastPlayer;"),
     Mutant("M16", "R3", "reset() no reinicia el estado de la partida", GAME,
            "    m_winningLine.reset();\n    m_status = GameStatus::InProgress;\n",
@@ -215,6 +215,11 @@ def apply(project: Path, mutant: Mutant) -> str:
     return original
 
 
+def decimal(value: float, digits: int = 1) -> str:
+    """Número con coma decimal, como se escribe en español."""
+    return f"{value:.{digits}f}".replace(".", ",")
+
+
 def latex_escape(text: str) -> str:
     return text.replace("&", r"\&").replace("%", r"\%").replace("_", r"\_").replace("#", r"\#")
 
@@ -229,11 +234,11 @@ def write_reports(results: dict) -> None:
 
     rows = [
         ("Casos ejecutados", lambda s: str(s["cases"])),
-        ("Casos que fallan sin mutantes", lambda s: str(s["baseline_failures"])),
+        ("Fallan con el código correcto", lambda s: str(s["baseline_failures"])),
         ("Aserciones", lambda s: str(s["assertions"])),
         ("Líneas de código de prueba", lambda s: str(s["test_lines"])),
-        ("Cobertura de líneas (dominio)", lambda s: f'{s["coverage"]["lines"]:.1f}\\,\\%'),
-        ("Cobertura de ramas (dominio)", lambda s: f'{s["coverage"]["branches"]:.1f}\\,\\%'),
+        ("Cobertura de líneas (dominio)", lambda s: decimal(s["coverage"]["lines"]) + "\\,\\%"),
+        ("Cobertura de ramas (dominio)", lambda s: decimal(s["coverage"]["branches"]) + "\\,\\%"),
         ("Mutantes detectados", lambda s: f'{s["killed"]} de {total}'),
         ("Puntaje de mutación", lambda s: f'{s["mutation_score"]:.0f}\\,\\%'),
     ]
@@ -255,6 +260,23 @@ def write_reports(results: dict) -> None:
                    + " & ".join(marks) + r" \\")
     tex += [r"\bottomrule", r"\end{tabular}", ""]
     (OUTPUT_DIR / "mutantes.tex").write_text("\n".join(tex), encoding="utf-8")
+
+    # Macros para la presentación: \metric{<suite>}{<métrica>}
+    macros = ["% Archivo generado por tools/compare_suites.py: no editar a mano.",
+              rf"\expandafter\def\csname metric@total@mutants\endcsname{{{total}}}"]
+    for suite in suites:
+        values = {
+            "cases": suite["cases"], "failures": suite["baseline_failures"],
+            "assertions": suite["assertions"], "testlines": suite["test_lines"],
+            "lines": f'{suite["coverage"]["lines"]:.1f}', "branches": f'{suite["coverage"]["branches"]:.1f}',
+            "regions": f'{suite["coverage"]["regions"]:.1f}', "killed": suite["killed"],
+            "score": f'{suite["mutation_score"]:.0f}',
+            "linestext": decimal(suite["coverage"]["lines"]),
+            "perCase": decimal(suite["assertions"] / suite["cases"]),
+        }
+        macros += [rf'\expandafter\def\csname metric@{suite["key"].replace("_", "")}@{name}\endcsname{{{value}}}'
+                   for name, value in values.items()]
+    (OUTPUT_DIR / "metricas.tex").write_text("\n".join(macros) + "\n", encoding="utf-8")
 
     md = ["# Resultados de la comparación", "",
           "Generado por `tools/compare_suites.py`. Cobertura medida sobre `src/core`.", "",

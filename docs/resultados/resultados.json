@@ -12,8 +12,8 @@
         "branches": 100,
         "regions": 100
       },
-      "assertions": 161,
-      "test_lines": 695,
+      "assertions": 165,
+      "test_lines": 699,
       "killed": 16,
       "mutation_score": 100.0
     },
@@ -240,7 +240,7 @@
     {
       "key": "M15",
       "requirement": "R3",
-      "description": "winner() devuelve al último jugador aunque no haya ganado",
+      "description": "winner() informa un ganador cuando nadie ganó",
       "file": "src/core/src/tictactoe/TicTacToe.cpp",
       "original": "return m_status == GameStatus::Won ? m_lastPlayer : std::nullopt;",
       "mutated": "return m_lastPlayer;",

@@ -5,11 +5,11 @@ Generado por `tools/compare_suites.py`. Cobertura medida sobre `src/core`.
 | Métrica | Repositorio (TDD) | IA: prompt básico | IA: prompt estructurado |
 | --- | --- | --- | --- |
 | Casos ejecutados | 85 | 11 | 23 |
-| Casos que fallan sin mutantes | 0 | 0 | 1 |
-| Aserciones | 161 | 11 | 40 |
-| Líneas de código de prueba | 695 | 103 | 194 |
-| Cobertura de líneas (dominio) | 100.0 % | 64.0 % | 96.8 % |
-| Cobertura de ramas (dominio) | 100.0 % | 83.3 % | 100.0 % |
+| Fallan con el código correcto | 0 | 0 | 1 |
+| Aserciones | 165 | 11 | 40 |
+| Líneas de código de prueba | 699 | 103 | 194 |
+| Cobertura de líneas (dominio) | 100,0 % | 64,0 % | 96,8 % |
+| Cobertura de ramas (dominio) | 100,0 % | 83,3 % | 100,0 % |
 | Mutantes detectados | 16 de 16 | 5 de 16 | 14 de 16 |
 | Puntaje de mutación | 100 % | 31 % | 88 % |
 
@@ -31,7 +31,7 @@ Generado por `tools/compare_suites.py`. Cobertura medida sobre `src/core`.
 | M12 | R3 | No reconoce la fila inferior | detectado | **sobrevive** | detectado |
 | M13 | R3 | Un tablero lleno es empate aunque haya línea | detectado | **sobrevive** | **sobrevive** |
 | M14 | R3 | Se puede seguir jugando después de ganar | detectado | **sobrevive** | detectado |
-| M15 | R3 | winner() devuelve al último jugador aunque no haya ganado | detectado | **sobrevive** | detectado |
+| M15 | R3 | winner() informa un ganador cuando nadie ganó | detectado | **sobrevive** | detectado |
 | M16 | R3 | reset() no reinicia el estado de la partida | detectado | **sobrevive** | detectado |
 
 ## Pruebas que fallan sin mutantes
