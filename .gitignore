@@ -1,0 +1,19 @@
+# Compilación e instalación
+build/
+dist/
+CMakeUserPresets.json
+compile_commands.json
+
+# Qt Creator / IDEs
+*.user
+*.user.*
+*.autosave
+.qtcreator/
+.qmlls.ini
+.vscode/
+.idea/
+.cache/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

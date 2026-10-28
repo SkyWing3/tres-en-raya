@@ -1,0 +1,32 @@
+# Estilo de código del proyecto (basado en el estilo oficial de Qt).
+BasedOnStyle: WebKit
+Standard: c++20
+ColumnLimit: 100
+
+AlignAfterOpenBracket: Align
+AlignEscapedNewlines: DontAlign
+AllowShortFunctionsOnASingleLine: InlineOnly
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: false
+  AfterEnum: false
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: true
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: AfterColon
+Cpp11BracedListStyle: true
+FixNamespaceComments: true
+IncludeBlocks: Preserve
+NamespaceIndentation: None
+PenaltyReturnTypeOnItsOwnLine: 5000
+PointerAlignment: Right
+SortIncludes: CaseSensitive
+SpaceAfterTemplateKeyword: false
+SpaceBeforeCpp11BracedList: false
+ForEachMacros: [foreach, Q_FOREACH, forever, Q_FOREVER]

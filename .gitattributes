@@ -1,0 +1,8 @@
+# Normaliza los finales de línea: LF en el repositorio y en la copia de trabajo,
+# para que macOS y Windows compartan exactamente los mismos archivos.
+* text=auto eol=lf
+
+# Archivos binarios: sin conversión de finales de línea ni diffs de texto.
+*.png  binary
+*.icns binary
+*.ico  binary
