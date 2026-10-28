@@ -1,0 +1,267 @@
+{
+  "suites": [
+    {
+      "key": "repositorio",
+      "name": "Repositorio (TDD)",
+      "short": "Repo",
+      "cases": 85,
+      "baseline_failures": 0,
+      "baseline_failed_tests": [],
+      "coverage": {
+        "lines": 100,
+        "branches": 100,
+        "regions": 100
+      },
+      "assertions": 161,
+      "test_lines": 695,
+      "killed": 16,
+      "mutation_score": 100.0
+    },
+    {
+      "key": "ia_basico",
+      "name": "IA: prompt básico",
+      "short": "IA básica",
+      "cases": 11,
+      "baseline_failures": 0,
+      "baseline_failed_tests": [],
+      "coverage": {
+        "lines": 64,
+        "branches": 83.3,
+        "regions": 74.3
+      },
+      "assertions": 11,
+      "test_lines": 103,
+      "killed": 5,
+      "mutation_score": 31.25
+    },
+    {
+      "key": "ia_estructurado",
+      "name": "IA: prompt estructurado",
+      "short": "IA estruct.",
+      "cases": 23,
+      "baseline_failures": 1,
+      "baseline_failed_tests": [
+        "tst_ia_estructurado::winOnLastMoveIsNotDraw()"
+      ],
+      "coverage": {
+        "lines": 96.8,
+        "branches": 100,
+        "regions": 97.1
+      },
+      "assertions": 40,
+      "test_lines": 194,
+      "killed": 14,
+      "mutation_score": 87.5
+    }
+  ],
+  "mutants": [
+    {
+      "key": "M1",
+      "requirement": "R1",
+      "description": "Rechaza la coordenada 3 (límite superior excluido)",
+      "file": "src/core/src/tictactoe/Board.cpp",
+      "original": "coordinate <= kMaxCoordinate",
+      "mutated": "coordinate < kMaxCoordinate",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": true,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M2",
+      "requirement": "R1",
+      "description": "Acepta la coordenada 0",
+      "file": "src/core/src/tictactoe/Board.cpp",
+      "original": "coordinate >= kMinCoordinate",
+      "mutated": "coordinate >= kMinCoordinate - 1",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": false,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M3",
+      "requirement": "R1",
+      "description": "Acepta la coordenada 4",
+      "file": "src/core/src/tictactoe/Board.cpp",
+      "original": "coordinate <= kMaxCoordinate",
+      "mutated": "coordinate <= kMaxCoordinate + 1",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": false,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M4",
+      "requirement": "R1",
+      "description": "Informa el eje equivocado al salir del eje X",
+      "file": "src/core/src/tictactoe/Board.cpp",
+      "original": "throw OutOfBoardException(Axis::X, position.x);",
+      "mutated": "throw OutOfBoardException(Axis::Y, position.x);",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": false,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M5",
+      "requirement": "R1",
+      "description": "Permite jugar sobre una casilla ocupada",
+      "file": "src/core/src/tictactoe/Board.cpp",
+      "original": "throw OccupiedCellException(position, *occupant);",
+      "mutated": "(void)occupant;",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": true,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M6",
+      "requirement": "R1",
+      "description": "El tablero nunca se considera lleno",
+      "file": "src/core/src/tictactoe/Board.cpp",
+      "original": "return std::ranges::all_of(m_cells, [](const auto &cell) { return cell.has_value(); });",
+      "mutated": "return false;",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": false,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M7",
+      "requirement": "R2",
+      "description": "El primer turno es de O",
+      "file": "src/core/include/tresenraya/tictactoe/TicTacToe.h",
+      "original": "static constexpr Player kFirstPlayer = Player::X;",
+      "mutated": "static constexpr Player kFirstPlayer = Player::O;",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": true,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M8",
+      "requirement": "R2",
+      "description": "Los turnos no alternan",
+      "file": "src/core/src/tictactoe/TicTacToe.cpp",
+      "original": "return m_lastPlayer ? opponentOf(*m_lastPlayer) : kFirstPlayer;",
+      "mutated": "return kFirstPlayer;",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": true,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M9",
+      "requirement": "R2",
+      "description": "Una jugada inválida consume el turno",
+      "file": "src/core/src/tictactoe/TicTacToe.cpp",
+      "original": "    m_board.place(position, player);\n    m_lastPlayer = player;\n",
+      "mutated": "    m_lastPlayer = player;\n    m_board.place(position, player);\n",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": false,
+        "ia_estructurado": false
+      }
+    },
+    {
+      "key": "M10",
+      "requirement": "R3",
+      "description": "No reconoce la diagonal secundaria",
+      "file": "src/core/src/tictactoe/TicTacToe.cpp",
+      "original": "Line{{{3, 1}, {2, 2}, {1, 3}}},",
+      "mutated": "Line{{{1, 1}, {2, 2}, {3, 3}}},",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": true,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M11",
+      "requirement": "R3",
+      "description": "No reconoce la tercera columna",
+      "file": "src/core/src/tictactoe/TicTacToe.cpp",
+      "original": "Line{{{3, 1}, {3, 2}, {3, 3}}},",
+      "mutated": "Line{{{1, 1}, {1, 2}, {1, 3}}},",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": false,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M12",
+      "requirement": "R3",
+      "description": "No reconoce la fila inferior",
+      "file": "src/core/src/tictactoe/TicTacToe.cpp",
+      "original": "Line{{{1, 3}, {2, 3}, {3, 3}}},",
+      "mutated": "Line{{{1, 1}, {2, 1}, {3, 1}}},",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": false,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M13",
+      "requirement": "R3",
+      "description": "Un tablero lleno es empate aunque haya línea",
+      "file": "src/core/src/tictactoe/TicTacToe.cpp",
+      "original": "    if (m_winningLine)\n        m_status = GameStatus::Won;\n    else if (m_board.isFull())\n        m_status = GameStatus::Draw;\n",
+      "mutated": "    if (m_board.isFull())\n        m_status = GameStatus::Draw;\n    else if (m_winningLine)\n        m_status = GameStatus::Won;\n",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": false,
+        "ia_estructurado": false
+      }
+    },
+    {
+      "key": "M14",
+      "requirement": "R3",
+      "description": "Se puede seguir jugando después de ganar",
+      "file": "src/core/src/tictactoe/TicTacToe.cpp",
+      "original": "    if (isOver())\n        throw GameOverException();\n",
+      "mutated": "",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": false,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M15",
+      "requirement": "R3",
+      "description": "winner() devuelve al último jugador aunque no haya ganado",
+      "file": "src/core/src/tictactoe/TicTacToe.cpp",
+      "original": "return m_status == GameStatus::Won ? m_lastPlayer : std::nullopt;",
+      "mutated": "return m_lastPlayer;",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": false,
+        "ia_estructurado": true
+      }
+    },
+    {
+      "key": "M16",
+      "requirement": "R3",
+      "description": "reset() no reinicia el estado de la partida",
+      "file": "src/core/src/tictactoe/TicTacToe.cpp",
+      "original": "    m_winningLine.reset();\n    m_status = GameStatus::InProgress;\n",
+      "mutated": "    m_winningLine.reset();\n",
+      "killed_by": {
+        "repositorio": true,
+        "ia_basico": false,
+        "ia_estructurado": true
+      }
+    }
+  ]
+}

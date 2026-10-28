@@ -1,0 +1,23 @@
+% Archivo generado por tools/compare_suites.py: no editar a mano.
+\begin{tabular}{llp{5.6cm}ccc}
+\toprule
+& Req. & Error introducido & \textbf{Repo} & \textbf{IA básica} & \textbf{IA estruct.} \\
+\midrule
+M1 & R1 & Rechaza la coordenada 3 (límite superior excluido) & \killed & \killed & \killed \\
+M2 & R1 & Acepta la coordenada 0 & \killed & \survived & \killed \\
+M3 & R1 & Acepta la coordenada 4 & \killed & \survived & \killed \\
+M4 & R1 & Informa el eje equivocado al salir del eje X & \killed & \survived & \killed \\
+M5 & R1 & Permite jugar sobre una casilla ocupada & \killed & \killed & \killed \\
+M6 & R1 & El tablero nunca se considera lleno & \killed & \survived & \killed \\
+M7 & R2 & El primer turno es de O & \killed & \killed & \killed \\
+M8 & R2 & Los turnos no alternan & \killed & \killed & \killed \\
+M9 & R2 & Una jugada inválida consume el turno & \killed & \survived & \survived \\
+M10 & R3 & No reconoce la diagonal secundaria & \killed & \killed & \killed \\
+M11 & R3 & No reconoce la tercera columna & \killed & \survived & \killed \\
+M12 & R3 & No reconoce la fila inferior & \killed & \survived & \killed \\
+M13 & R3 & Un tablero lleno es empate aunque haya línea & \killed & \survived & \survived \\
+M14 & R3 & Se puede seguir jugando después de ganar & \killed & \survived & \killed \\
+M15 & R3 & winner() devuelve al último jugador aunque no haya ganado & \killed & \survived & \killed \\
+M16 & R3 & reset() no reinicia el estado de la partida & \killed & \survived & \killed \\
+\bottomrule
+\end{tabular}
